@@ -1,84 +1,71 @@
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
 struct Node {
     int data;
-    Node* next;
-
-    Node(int value) : data(value), next(nullptr) {}
+    struct Node* next;
 };
-class LinkedList {
-private:
-    Node* head;
 
-public:
-    LinkedList() : head(nullptr) {}
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+void insertMiddle(struct Node** head, int data) {
+    struct Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
 
-    // Insert a node in the middle of the list
-    void insertMiddle(int data) {
-        Node* newNode = new Node(data);
-        if (!head) {
-            head = newNode;
-            return;
-        }
+    struct Node* slow = *head;
+    struct Node* fast = *head;
 
-        Node* slow = head;
-        Node* fast = head;
+    // Find the middle using slow and fast pointer technique
+    while (fast != NULL && fast->next != NULL) {
+        slow = slow->next;
+        fast = fast->next->next;
+    }
 
-        // Find the middle using slow and fast pointer technique
-        while (fast && fast->next) {
-            slow = slow->next;
-            fast = fast->next->next;
-        }
+    // Insert the new node in the middle
+    newNode->next = slow->next;
+    slow->next = newNode;
+}
 
-        // Insert the new node in the middle
-        newNode->next = slow->next;
-        slow->next = newNode;
+void deleteMiddle(struct Node** head) {
+    if (*head == NULL) return; // List is empty
+
+    if ((*head)->next == NULL) {
+        free(*head); // List has only one node
+        *head = NULL;
+        return;
+    }
+
+    struct Node* slow = *head;
+    struct Node* fast = *head;
+    struct Node* prev = NULL;
+
+    // Find the middle node using slow and fast pointer technique
+    while (fast != NULL && fast->next != NULL) {
+        prev = slow;
+        slow = slow->next;
+        fast = fast->next->next;
     }
 
     // Delete the middle node
-    void deleteMiddle() {
-        if (!head) return; // List is empty
-
-        if (!head->next) {
-            delete head; // List has only one node
-            head = nullptr;
-            return;
-        }
-
-        Node* slow = head;
-        Node* fast = head;
-        Node* prev = nullptr;
-
-        // Find the middle node using slow and fast pointer technique
-        while (fast && fast->next) {
-            prev = slow;
-            slow = slow->next;
-            fast = fast->next->next;
-        }
-
-        // Delete the middle node
-        if (prev) {
-            prev->next = slow->next;
-            delete slow; // Free memory
-        }
+    if (prev != NULL) {
+        prev->next = slow->next;
+        free(slow); // Free memory
     }
+}
 
-    // Print the linked list
-    void printList() const {
-        Node* current = head;
-        while (current) {
-            std::cout << current->data << " -> ";
-            current = current->next;
-        }
-        std::cout << "nullptr" << std::endl;
+void printList(struct Node* head) {
+    struct Node* current = head;
+    while (current != NULL) {
+        printf("%d -> ", current->data);
+        current = current->next;
     }
-
-    // Destructor to free memory
-    ~LinkedList() {
-        while (head) {
-            Node* temp = head;
-            head = head->next;
-            delete temp;
-        }
-    }
-};
+    printf("NULL\n");
+}
